@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vocabulary Master • Flashcard EdTech</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                        },
+                        accent: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            500: '#f97316',
+                            600: '#ea580c',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .transform-style-3d {
+            transform-style: preserve-3d;
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 h-full flex flex-col overflow-x-hidden selection:bg-sky-100 selection:text-sky-800">
+
+    <!-- Floating Trigger when Control Bar is Hidden -->
+    <div id="show-bar-trigger" class="fixed top-0 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 -translate-y-full opacity-0 pointer-events-none">
+        <button onclick="toggleControlBar()" class="bg-white hover:bg-slate-100 text-slate-700 px-4 py-1.5 rounded-b-xl shadow-md border border-t-0 border-slate-200 text-xs font-medium flex items-center gap-2 cursor-pointer">
+            <i class="fa-solid fa-chevron-down text-sky-600"></i> Hiển thị thanh điều khiển
+        </button>
+    </div>
+
+    <!-- TOP CONTROL BAR -->
+    <header id="top-control-bar" class="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-40 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+            
+            <!-- Logo & Title -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-accent-500 flex items-center justify-center text-white shadow-md shadow-sky-500/20">
+                    <i class="fa-solid fa-graduation-cap text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-slate-900 tracking-tight text-base sm:text-lg flex items-center gap-2">
+                        VOCABULARY MASTER
+                        <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-sky-100 text-sky-700 hidden sm:inline-block">Unit 1–6</span>
+                    </h1>
+                    <p class="text-xs text-slate-500 hidden sm:block">Flashcard EdTech • 96 Từ vựng chuyên sâu</p>
+                </div>
+            </div>
+
+            <!-- Navigation Tabs & Selectors -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <!-- View Switcher -->
+                <div class="bg-slate-100 p-1 rounded-xl flex items-center text-xs font-medium">
+                    <button onclick="switchView('flashcard')" id="nav-btn-flashcard" class="px-3 py-1.5 rounded-lg transition-all text-slate-700 bg-white shadow-sm flex items-center gap-1.5">
+                        <i class="fa-solid fa-clone text-sky-600"></i> <span class="hidden md:inline">Flashcard</span>
+                    </button>
+                    <button onclick="switchView('dashboard')" id="nav-btn-dashboard" class="px-3 py-1.5 rounded-lg transition-all text-slate-600 hover:text-slate-900 flex items-center gap-1.5">
+                        <i class="fa-solid fa-chart-pie text-accent-500"></i> <span class="hidden md:inline">Dashboard</span>
+                    </button>
+                </div>
+
+                <!-- Unit & Chapter Filter (Flashcard mode only) -->
+                <div id="filter-controls" class="hidden sm:flex items-center gap-2">
+                    <select id="unit-select" onchange="onFilterChange()" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-xl px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                        <option value="all">Tất cả Units (96 từ)</option>
+                        <option value="1">Unit 1 (16 từ)</option>
+                        <option value="2">Unit 2 (16 từ)</option>
+                        <option value="3">Unit 3 (16 từ)</option>
+                        <option value="4">Unit 4 (16 từ)</option>
+                        <option value="5">Unit 5 (16 từ)</option>
+                        <option value="6">Unit 6 (16 từ)</option>
+                    </select>
+                    <select id="chapter-select" onchange="onFilterChange()" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-xl px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                        <option value="all">Cả 2 Chapters</option>
+                        <option value="1">Chapter 1 (8 từ)</option>
+                        <option value="2">Chapter 2 (8 từ)</option>
+                    </select>
+                </div>
+
+                <!-- Mode Select -->
+                <div class="relative hidden lg:block">
+                    <select id="mode-select" onchange="onModeChange()" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-xl px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                        <option value="en-vi">Anh ➔ Việt</option>
+                        <option value="vi-en">Việt ➔ Anh</option>
+                        <option value="random">🔀 Xáo trộn</option>
+                        <option value="review">⭐ Cần ôn tập</option>
+                    </select>
+                </div>
+
+                <!-- Search Input Trigger / Modal -->
+                <button onclick="openSearchModal()" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-all" title="Tìm kiếm từ vựng">
+                    <i class="fa-solid fa-search text-xs"></i>
+                </button>
+
+                <!-- Settings / Reset -->
+                <button onclick="openSettingsModal()" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-all" title="Cài đặt & Dữ liệu">
+                    <i class="fa-solid fa-gear text-xs"></i>
+                </button>
+
+                <!-- Hide Bar Button -->
+                <button onclick="toggleControlBar()" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-all" title="Ẩn thanh điều khiển">
+                    <i class="fa-solid fa-chevron-up text-xs"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN APP CONTAINER -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col justify-center">
+
+        <!-- VIEW 1: FLASHCARD LEARNING VIEW -->
+        <div id="view-flashcard" class="flex flex-col items-center justify-center w-full max-w-3xl mx-auto transition-all">
+            
+            <!-- Mobile Filters Bar (Visible on smaller screens) -->
+            <div class="w-full flex sm:hidden items-center justify-between gap-2 mb-4 bg-white p-3 rounded-2xl shadow-sm border border-slate-100">
+                <select id="unit-select-mob" onchange="document.getElementById('unit-select').value=this.value; onFilterChange();" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-xl px-2 py-1.5 w-1/2">
+                    <option value="all">Tất cả Units</option>
+                    <option value="1">Unit 1</option>
+                    <option value="2">Unit 2</option>
+                    <option value="3">Unit 3</option>
+                    <option value="4">Unit 4</option>
+                    <option value="5">Unit 5</option>
+                    <option value="6">Unit 6</option>
+                </select>
+                <select id="mode-select-mob" onchange="document.getElementById('mode-select').value=this.value; onModeChange();" class="bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-xl px-2 py-1.5 w-1/2">
+                    <option value="en-vi">Anh ➔ Việt</option>
+                    <option value="vi-en">Việt ➔ Anh</option>
+                    <option value="random">Xáo trộn</option>
+                    <option value="review">Cần ôn tập</option>
+                </select>
+            </div>
+
+            <!-- Progress Header & Stats -->
+            <div class="w-full flex items-center justify-between mb-4 text-xs font-medium text-slate-500">
+                <div class="flex items-center gap-2">
+                    <span id="card-counter" class="bg-sky-100 text-sky-700 px-3 py-1 rounded-full font-semibold">Thẻ 1 / 96</span>
+                    <span id="current-category-badge" class="bg-slate-100 text-slate-600 px-3 py-1 rounded-full hidden sm:inline-block">Unit 1 • Chapter 1</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="flex items-center gap-1 text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full">
+                        <i class="fa-solid fa-circle-check"></i> <span id="stat-known-count">0</span> đã thuộc
+                    </span>
+                    <span class="flex items-center gap-1 text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full">
+                        <i class="fa-solid fa-bookmark"></i> <span id="stat-review-count">0</span> cần ôn
+                    </span>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-slate-200 h-2 rounded-full mb-6 overflow-hidden">
+                <div id="progress-bar" class="bg-gradient-to-r from-sky-500 to-accent-500 h-full w-0 transition-all duration-300 rounded-full"></div>
+            </div>
+
+            <!-- FLASHCARD CONTAINER (3D FLIP) -->
+            <div class="w-full perspective-1000 min-h-[380px] sm:min-h-[420px] cursor-pointer group" onclick="flipCard()">
+                <div id="flashcard-inner" class="relative w-full h-full min-h-[380px] sm:min-h-[420px] duration-500 transform-style-3d shadow-xl rounded-3xl bg-white border border-slate-100">
+                    
+                    <!-- FRONT SIDE -->
+                    <div class="absolute inset-0 w-full h-full backface-hidden bg-white rounded-3xl p-6 sm:p-10 flex flex-col justify-between select-none">
+                        <!-- Top tags -->
+                        <div class="flex items-center justify-between">
+                            <span id="front-badge" class="text-xs font-semibold px-3 py-1 rounded-full bg-sky-50 text-sky-700 border border-sky-100">Unit 1 • Chapter 1</span>
+                            <div class="flex items-center gap-2" onclick="event.stopPropagation()">
+                                <button onclick="toggleReviewCurrent(event)" id="front-review-btn" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-amber-50 hover:text-amber-600 text-slate-400 flex items-center justify-center transition-all" title="Đánh dấu cần ôn tập">
+                                    <i class="fa-solid fa-bookmark"></i>
+                                </button>
+                                <button onclick="toggleKnownCurrent(event)" id="front-known-btn" class="w-9 h-9 rounded-full bg-slate-100 hover:bg-emerald-50 hover:text-emerald-600 text-slate-400 flex items-center justify-center transition-all" title="Đánh dấu đã thuộc">
+                                    <i class="fa-solid fa-check"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Center Word Content -->
+                        <div class="flex flex-col items-center justify-center text-center my-auto py-6">
+                            <div id="front-sub-hint" class="text-xs uppercase tracking-widest text-slate-400 font-semibold mb-2">English Vocabulary</div>
+                            <h2 id="front-main-text" class="text-3xl sm:text-5xl font-bold text-slate-900 tracking-tight mb-3">academic</h2>
+                            <div id="front-meta" class="flex items-center gap-3 text-sm text-slate-500 font-medium">
+                                <span id="front-ipa" class="text-sky-600 font-mono">/ˌækəˈdemɪk/</span>
+                                <span>•</span>
+                                <span id="front-pos" class="italic bg-slate-100 px-2.5 py-0.5 rounded-md">adj.</span>
+                            </div>
+                            <!-- Audio Button -->
+                            <button onclick="playPronunciation(event)" class="mt-5 w-12 h-12 rounded-full bg-sky-50 hover:bg-sky-100 text-sky-600 flex items-center justify-center transition-all shadow-sm" title="Nghe phát âm">
+                                <i class="fa-solid fa-volume-high text-lg"></i>
+                            </button>
+                        </div>
+
+                        <!-- Bottom Flip Prompt -->
+                        <div class="text-center text-xs text-slate-400 font-medium flex items-center justify-center gap-1.5 group-hover:text-sky-600 transition-colors">
+                            <i class="fa-solid fa-rotate animate-spin-slow"></i> Nhấn vào thẻ để lật xem nghĩa & ví dụ
+                        </div>
+                    </div>
+
+                    <!-- BACK SIDE -->
+                    <div class="absolute inset-0 w-full h-full backface-hidden rotate-y-180 bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-3xl p-6 sm:p-10 flex flex-col justify-between select-none">
+                        <!-- Top tags -->
+                        <div class="flex items-center justify-between">
+                            <span id="back-badge" class="text-xs font-semibold px-3 py-1 rounded-full bg-slate-800 text-sky-400 border border-slate-700">Unit 1 • Chapter 1</span>
+                            <div class="flex items-center gap-2" onclick="event.stopPropagation()">
+                                <button onclick="toggleReviewCurrent(event)" id="back-review-btn" class="w-9 h-9 rounded-full bg-slate-800 hover:bg-amber-500 hover:text-white text-slate-400 flex items-center justify-center transition-all" title="Đánh dấu cần ôn tập">
+                                    <i class="fa-solid fa-bookmark"></i>
+                                </button>
+                                <button onclick="toggleKnownCurrent(event)" id="back-known-btn" class="w-9 h-9 rounded-full bg-slate-800 hover:bg-emerald-500 hover:text-white text-slate-400 flex items-center justify-center transition-all" title="Đánh dấu đã thuộc">
+                                    <i class="fa-solid fa-check"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Back Content Details -->
+                        <div class="flex flex-col justify-center my-auto space-y-3 py-2 overflow-y-auto max-h-[260px]">
+                            <div>
+                                <div class="text-[10px] uppercase tracking-wider text-sky-400 font-semibold">Vietnamese Meaning</div>
+                                <div id="back-vietnamese" class="text-xl sm:text-2xl font-bold text-white">thuộc học thuật, liên quan đến việc học</div>
+                            </div>
+                            <div>
+                                <div class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">English Definition</div>
+                                <div id="back-definition" class="text-xs sm:text-sm text-slate-300">Connected with education and studying, especially at a college or university.</div>
+                            </div>
+                            <div class="bg-slate-800/80 rounded-2xl p-3 border border-slate-700/50">
+                                <div class="text-[10px] uppercase tracking-wider text-accent-400 font-semibold mb-1 flex items-center gap-1">
+                                    <i class="fa-solid fa-quote-left"></i> Example Sentence
+                                </div>
+                                <div id="back-example" class="text-xs sm:text-sm text-slate-200 italic">"His academic work is excellent."</div>
+                            </div>
+                        </div>
+
+                        <!-- Bottom Flip Prompt -->
+                        <div class="text-center text-xs text-slate-400 font-medium flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-arrow-left"></i> Nhấn để quay lại mặt trước
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- CONTROLS BAR BELOW CARD -->
+            <div class="w-full flex items-center justify-between mt-6 gap-2">
+                <button onclick="prevCard()" class="px-4 sm:px-6 py-2.5 rounded-2xl bg-white hover:bg-slate-100 text-slate-700 font-medium text-xs sm:text-sm shadow-sm border border-slate-200 flex items-center gap-2 transition-all">
+                    <i class="fa-solid fa-arrow-left"></i> <span class="hidden sm:inline">Từ trước</span>
+                </button>
+
+                <div class="flex items-center gap-2">
+                    <button onclick="shuffleCards()" class="px-4 py-2.5 rounded-2xl bg-white hover:bg-slate-100 text-slate-700 font-medium text-xs sm:text-sm shadow-sm border border-slate-200 flex items-center gap-2 transition-all" title="Xáo trộn thẻ">
+                        <i class="fa-solid fa-shuffle text-sky-600"></i> <span class="hidden md:inline">Xáo trộn</span>
+                    </button>
+                    <button onclick="markKnown()" class="px-4 py-2.5 rounded-2xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-medium text-xs sm:text-sm shadow-sm border border-emerald-200 flex items-center gap-2 transition-all" title="Đã thuộc từ này">
+                        <i class="fa-solid fa-check"></i> <span class="hidden md:inline">Đã thuộc</span>
+                    </button>
+                    <button onclick="markReview()" class="px-4 py-2.5 rounded-2xl bg-amber-50 hover:bg-amber-100 text-amber-700 font-medium text-xs sm:text-sm shadow-sm border border-amber-200 flex items-center gap-2 transition-all" title="Cần ôn tập lại">
+                        <i class="fa-solid fa-bookmark"></i> <span class="hidden md:inline">Cần ôn</span>
+                    </button>
+                </div>
+
+                <button onclick="nextCard()" class="px-4 sm:px-6 py-2.5 rounded-2xl bg-sky-600 hover:bg-sky-700 text-white font-medium text-xs sm:text-sm shadow-md shadow-sky-500/25 flex items-center gap-2 transition-all">
+                    <span class="hidden sm:inline">Từ tiếp</span> <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+
+            <!-- Quick Keyboard Shortcuts Hint -->
+            <div class="mt-6 text-[11px] text-slate-400 text-center flex flex-wrap justify-center gap-4">
+                <span>💡 Phím tắt: <kbd class="bg-slate-200 px-1.5 py-0.5 rounded text-slate-600 font-mono">Space</kbd> Lật thẻ</span>
+                <span><kbd class="bg-slate-200 px-1.5 py-0.5 rounded text-slate-600 font-mono">← / →</kbd> Chuyển từ</span>
+                <span><kbd class="bg-slate-200 px-1.5 py-0.5 rounded text-slate-600 font-mono">K</kbd> Đã thuộc</span>
+                <span><kbd class="bg-slate-200 px-1.5 py-0.5 rounded text-slate-600 font-mono">R</kbd> Cần ôn</span>
+            </div>
+
+        </div>
+
+        <!-- VIEW 2: DASHBOARD VIEW -->
+        <div id="view-dashboard" class="hidden flex-col w-full max-w-5xl mx-auto py-2">
+            
+            <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Tiến độ học tập Flashcard</h2>
+                    <p class="text-sm text-slate-500">Tổng quan quá trình ghi nhớ 96 từ vựng qua 6 Units.</p>
+                </div>
+                <button onclick="switchView('flashcard')" class="self-start sm:self-auto bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-md transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-play"></i> Tiếp tục học Flashcard
+                </button>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm flex flex-col justify-between">
+                    <div class="flex items-center justify-between text-slate-500 mb-2">
+                        <span class="text-xs font-semibold uppercase tracking-wider">Tổng từ vựng</span>
+                        <div class="w-8 h-8 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
+                            <i class="fa-solid fa-book text-xs"></i>
+                        </div>
+                    </div>
+                    <div class="text-3xl font-bold text-slate-900">96</div>
+                    <div class="text-xs text-slate-400 mt-1">12 Chapters hoàn chỉnh</div>
+                </div>
+
+                <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm flex flex-col justify-between">
+                    <div class="flex items-center justify-between text-slate-500 mb-2">
+                        <span class="text-xs font-semibold uppercase tracking-wider">Đã ghi nhớ</span>
+                        <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                            <i class="fa-solid fa-circle-check text-xs"></i>
+                        </div>
+                    </div>
+                    <div id="dash-known-count" class="text-3xl font-bold text-emerald-600">0</div>
+                    <div id="dash-known-percent" class="text-xs text-emerald-600 mt-1 font-medium">0% hoàn thành</div>
+                </div>
+
+                <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm flex flex-col justify-between">
+                    <div class="flex items-center justify-between text-slate-500 mb-2">
+                        <span class="text-xs font-semibold uppercase tracking-wider">Cần ôn tập</span>
+                        <div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                            <i class="fa-solid fa-bookmark text-xs"></i>
+                        </div>
+                    </div>
+                    <div id="dash-review-count" class="text-3xl font-bold text-amber-600">0</div>
+                    <div class="text-xs text-amber-600 mt-1 font-medium">Đã đánh dấu xem lại</div>
+                </div>
+
+                <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm flex flex-col justify-between">
+                    <div class="flex items-center justify-between text-slate-500 mb-2">
+                        <span class="text-xs font-semibold uppercase tracking-wider">Tiến độ chung</span>
+                        <div class="w-8 h-8 rounded-xl bg-accent-50 text-accent-600 flex items-center justify-center">
+                            <i class="fa-solid fa-chart-line text-xs"></i>
+                        </div>
+                    </div>
+                    <div id="dash-overall-percent" class="text-3xl font-bold text-accent-600">0%</div>
+                    <div class="text-xs text-slate-400 mt-1">Dựa trên từ đã thuộc</div>
+                </div>
+            </div>
+
+            <!-- Unit Breakdown Section -->
+            <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm mb-8">
+                <h3 class="font-bold text-slate-900 text-base mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-layer-group text-sky-600"></i> Tiến độ chi tiết theo từng Unit
+                </h3>
+                <div id="unit-progress-list" class="space-y-4">
+                    <!-- Dynamically populated unit progress bars -->
+                </div>
+            </div>
+
+            <!-- Recently Studied / Quick Access -->
+            <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
+                <h3 class="font-bold text-slate-900 text-base mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-clock-rotate-left text-sky-600"></i> Từ vựng học gần đây
+                </h3>
+                <div id="recent-words-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                    <!-- Dynamically populated -->
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="mt-auto py-4 text-center text-xs text-slate-400 border-t border-slate-100">
+        Vocabulary Master • Flashcard EdTech • Unit 1–6 Chapter 1–2
+    </footer>
+
+    <!-- SEARCH MODAL -->
+    <div id="search-modal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl border border-slate-100 flex flex-col max-h-[85vh]">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-bold text-slate-900 text-lg flex items-center gap-2">
+                    <i class="fa-solid fa-search text-sky-600"></i> Tra cứu từ vựng
+                </h3>
+                <button onclick="closeSearchModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+            </div>
+            <div class="relative mb-4">
+                <input type="text" id="search-input" oninput="handleSearch(this.value)" placeholder="Nhập từ tiếng Anh hoặc nghĩa tiếng Việt..." class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
+                <i class="fa-solid fa-search absolute left-3.5 top-3.5 text-slate-400 text-sm"></i>
+            </div>
+            <div id="search-results" class="flex-1 overflow-y-auto space-y-2 pr-1">
+                <div class="text-center py-8 text-slate-400 text-xs">Nhập từ khóa để bắt đầu tìm kiếm trong 96 từ vựng...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SETTINGS MODAL -->
+    <div id="settings-modal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 flex flex-col">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-bold text-slate-900 text-lg flex items-center gap-2">
+                    <i class="fa-solid fa-gear text-sky-600"></i> Cài đặt & Dữ liệu
+                </h3>
+                <button onclick="closeSettingsModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center">
+                    <i class="fa-solid fa-xmark text-xs"></i>
+                </button>
+            </div>
+            <div class="space-y-4 mb-6">
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                    <div class="font-semibold text-slate-800 text-sm mb-1">Dữ liệu học tập cá nhân</div>
+                    <p class="text-xs text-slate-500 mb-3">Ứng dụng tự động lưu tiến độ, các từ đã thuộc và từ cần ôn tập vào trình duyệt.</p>
+                    <button onclick="confirmResetProgress()" class="bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold px-4 py-2 rounded-xl border border-rose-200 transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-rotate-right"></i> Đặt lại toàn bộ tiến độ học
+                    </button>
+                </div>
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                    <div class="font-semibold text-slate-800 text-sm mb-1">Thông tin phiên bản</div>
+                    <p class="text-xs text-slate-500">Vocabulary Master EdTech v2.5 • Đầy đủ 96 từ vựng chuẩn từ tài liệu Unit 1–6.</p>
+                </div>
+            </div>
+            <button onclick="closeSettingsModal()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-medium text-sm py-3 rounded-2xl transition-all">
+                Đóng
+            </button>
+        </div>
+    </div>
+
+    <!-- CUSTOM NOTIFICATION MODAL -->
+    <div id="custom-modal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 text-center flex flex-col items-center">
+            <div id="modal-icon" class="w-12 h-12 rounded-full bg-sky-50 text-sky-600 flex items-center justify-center text-xl mb-3">
+                <i class="fa-solid fa-circle-info"></i>
+            </div>
+            <h4 id="modal-title" class="font-bold text-slate-900 text-base mb-1">Thông báo</h4>
+            <p id="modal-message" class="text-xs text-slate-500 mb-5">Nội dung thông báo...</p>
+            <div id="modal-actions" class="flex items-center gap-2 w-full">
+                <button onclick="closeCustomModal()" class="flex-1 bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold py-2.5 rounded-xl transition-all">Đồng ý</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT DATA & APP LOGIC -->
+    <script>
+        // FULL 96 VOCABULARY DATABASE (UNITS 1-6, CHAPTERS 1-2)
+        const VOCABULARY_DATA = [
+            // UNIT 1 CHAPTER 1
+            { id: "u1c1_1", unit: 1, chapter: 1, word: "academic", ipa: "/ˌækəˈdemɪk/", pos: "adj.", definition: "Connected with education and studying, especially at a college or university.", vietnamese: "thuộc học thuật, liên quan đến việc học", example: "His academic work is excellent.", wordFamily: "academy, academically", collocations: "academic work, academic success" },
+            { id: "u1c1_2", unit: 1, chapter: 1, word: "component", ipa: "/kəmˈpəʊnənt/", pos: "n.", definition: "A part of a larger whole or piece of equipment.", vietnamese: "thành phần, bộ phận", example: "The team is working on the last component of their project.", wordFamily: "component part", collocations: "key component, essential component" },
+            { id: "u1c1_3", unit: 1, chapter: 1, word: "effective", ipa: "/ɪˈfektɪv/", pos: "adj.", definition: "Producing a successful result.", vietnamese: "có hiệu quả", example: "The medication is quite effective; it relieves pain quickly.", wordFamily: "effectively, effectiveness", collocations: "highly effective, effective method" },
+            { id: "u1c1_4", unit: 1, chapter: 1, word: "long-term", ipa: "/ˌlɒŋ ˈtɜːm/", pos: "adj.", definition: "Existing or happening over a long period of time.", vietnamese: "dài hạn, lâu dài", example: "Ben is in a long-term relationship with Denise.", wordFamily: "long-term goal", collocations: "long-term plan, long-term effect" },
+            { id: "u1c1_5", unit: 1, chapter: 1, word: "make an effort", ipa: "/meɪk ən ˈefət/", pos: "phr.", definition: "To try hard to do something.", vietnamese: "cố gắng, nỗ lực", example: "Most students made an effort to improve their test scores.", wordFamily: "effort", collocations: "make a great effort" },
+            { id: "u1c1_6", unit: 1, chapter: 1, word: "structure", ipa: "/ˈstrʌktʃə(r)/", pos: "n.", definition: "The arrangement of and relations between the parts or elements of something complex.", vietnamese: "cấu trúc, kết cấu", example: "The structure of your essay isn’t easy to understand.", wordFamily: "structural, structurally", collocations: "sentence structure, organizational structure" },
+            { id: "u1c1_7", unit: 1, chapter: 1, word: "technique", ipa: "/tekˈniːk/", pos: "n.", definition: "A way of carrying out a particular task.", vietnamese: "kỹ thuật, phương pháp", example: "Surgical techniques have developed so that only small cuts are needed for many operations.", wordFamily: "technical, technician", collocations: "teaching technique, advanced technique" },
+            { id: "u1c1_8", unit: 1, chapter: 1, word: "transfer", ipa: "/trænsˈfɜː(r)/", pos: "v.", definition: "To move from one place to another.", vietnamese: "chuyển, di chuyển", example: "We transferred our bags from the bus to the car.", wordFamily: "transferable, transference", collocations: "transfer money, transfer data" },
+
+            // UNIT 1 CHAPTER 2
+            { id: "u1c2_1", unit: 1, chapter: 2, word: "alternative", ipa: "/ɔːlˈtɜːnətɪv/", pos: "adj.", definition: "Available as another possibility or choice.", vietnamese: "thay thế, khác với thông thường", example: "An alternative to calling a friend is sending the friend an email.", wordFamily: "alternatively", collocations: "alternative energy, alternative solution" },
+            { id: "u1c2_2", unit: 1, chapter: 2, word: "apply", ipa: "/əˈplaɪ/", pos: "v.", definition: "To make use of as relevant or suitable.", vietnamese: "áp dụng, vận dụng", example: "You can apply what you learned in school to your first job.", wordFamily: "application, applicant", collocations: "apply knowledge, apply for a job" },
+            { id: "u1c2_3", unit: 1, chapter: 2, word: "assess", ipa: "/əˈses/", pos: "v.", definition: "To evaluate or estimate the nature, ability, or quality of.", vietnamese: "đánh giá, nhận định", example: "The doctor needs to assess if you’re well enough to travel.", wordFamily: "assessment", collocations: "assess a situation, assess performance" },
+            { id: "u1c2_4", unit: 1, chapter: 2, word: "interact", ipa: "/ˌɪntərˈækt/", pos: "v.", definition: "To act together or come together so as to have an effect on each other.", vietnamese: "tương tác, giao tiếp", example: "Teachers often encourage students to interact with each other in class.", wordFamily: "interaction, interactive", collocations: "interact with others, social interact" },
+            { id: "u1c2_5", unit: 1, chapter: 2, word: "debate", ipa: "/dɪˈbeɪt/", pos: "n.", definition: "A formal discussion on a particular matter in a public meeting or legislative assembly.", vietnamese: "cuộc tranh luận", example: "A discussion about who to vote for often becomes a debate.", wordFamily: "debater", collocations: "engage in debate, public debate" },
+            { id: "u1c2_6", unit: 1, chapter: 2, word: "measure", ipa: "/ˈmeʒə(r)/", pos: "v.", definition: "To ascertain the size, amount, or degree of by using standard units.", vietnamese: "đo lường", example: "I measured the length of the room for a new rug.", wordFamily: "measurement, measurable", collocations: "measure success, measure distance" },
+            { id: "u1c2_7", unit: 1, chapter: 2, word: "memorize", ipa: "/ˈmeməraɪz/", pos: "v.", definition: "To commit to memory; learn by heart.", vietnamese: "ghi nhớ, học thuộc lòng", example: "Students memorize the verb forms of a new language.", wordFamily: "memory, memorable", collocations: "memorize vocabulary, memorize a speech" },
+            { id: "u1c2_8", unit: 1, chapter: 2, word: "reform", ipa: "/rɪˈfɔːm/", pos: "v.", definition: "To make changes in order to improve it.", vietnamese: "cải cách, cải tổ", example: "The new president reformed the nation’s health care system.", wordFamily: "reformer, reformation", collocations: "reform education, political reform" },
+
+            // UNIT 2 CHAPTER 1
+            { id: "u2c1_1", unit: 2, chapter: 1, word: "accommodation", ipa: "/əˌkɒməˈdeɪʃən/", pos: "n.", definition: "A place to live, work, or stay in.", vietnamese: "chỗ ở, nơi lưu trú", example: "I need to look for accommodation as soon as I move to a new country.", wordFamily: "accommodate", collocations: "find accommodation, student accommodation" },
+            { id: "u2c1_2", unit: 2, chapter: 1, word: "basic", ipa: "/ˈbeɪsɪk/", pos: "adj.", definition: "Forming an essential foundation; primary.", vietnamese: "cơ bản, thiết yếu", example: "A basic hotel room has a bed and a bathroom, and maybe an air conditioner.", wordFamily: "basically, basis", collocations: "basic needs, basic training" },
+            { id: "u2c1_3", unit: 2, chapter: 1, word: "eager", ipa: "/ˈiːɡə(r)/", pos: "adj.", definition: "Showing keen interest or intense desire.", vietnamese: "háo hức, mong muốn", example: "The little girl was eager to ride a plane for the first time.", wordFamily: "eagerness, eagerly", collocations: "eager to learn, eager anticipation" },
+            { id: "u2c1_4", unit: 2, chapter: 1, word: "exhausting", ipa: "/ɪɡˈzɔːstɪŋ/", pos: "adj.", definition: "Making you feel very tired.", vietnamese: "kiệt sức, rất mệt mỏi", example: "I’ve had an exhausting day, so I’m going to bed.", wordFamily: "exhaust, exhausted, exhaustion", collocations: "exhausting journey, exhausting workout" },
+            { id: "u2c1_5", unit: 2, chapter: 1, word: "fabulous", ipa: "/ˈfæbjələs/", pos: "adj.", definition: "Extraordinary, excellent, very good.", vietnamese: "tuyệt vời, xuất sắc", example: "We had a fabulous time on our vacation!", wordFamily: "fabulously", collocations: "fabulous view, fabulous meal" },
+            { id: "u2c1_6", unit: 2, chapter: 1, word: "possession", ipa: "/pəˈzeʃən/", pos: "n.", definition: "The state of having, owning, or controlling something.", vietnamese: "tài sản, vật sở hữu", example: "Her most valuable possession is a car worth $40,000.", wordFamily: "possess, possessive", collocations: "personal possession, take possession" },
+            { id: "u2c1_7", unit: 2, chapter: 1, word: "range", ipa: "/reɪndʒ/", pos: "n.", definition: "A variety of different things or activities.", vietnamese: "phạm vi, hàng loạt", example: "You can find a range of hair products at a beauty salon.", wordFamily: "range", collocations: "wide range, price range" },
+            { id: "u2c1_8", unit: 2, chapter: 1, word: "unique", ipa: "/juˈniːk/", pos: "adj.", definition: "Being the only one of its kind; unlike anything else.", vietnamese: "độc đáo, duy nhất", example: "Each person in the world has a unique personality.", wordFamily: "uniquely, uniqueness", collocations: "unique opportunity, unique style" },
+
+            // UNIT 2 CHAPTER 2
+            { id: "u2c2_1", unit: 2, chapter: 2, word: "assume", ipa: "/əˈsjuːm/", pos: "v.", definition: "To accept that something is true without proof.", vietnamese: "cho rằng, giả định", example: "I didn’t call because I assumed you were busy.", wordFamily: "assumption", collocations: "assume responsibility, assume that" },
+            { id: "u2c2_2", unit: 2, chapter: 2, word: "authorized", ipa: "/ˈɔːθəraɪzd/", pos: "adj.", definition: "Having official permission or approval.", vietnamese: "được ủy quyền, được cho phép", example: "You aren’t authorized to be in this area.", wordFamily: "authorize, authorization", collocations: "authorized personnel, authorized dealer" },
+            { id: "u2c2_3", unit: 2, chapter: 2, word: "departure", ipa: "/dɪˈpɑːtʃə(r)/", pos: "n.", definition: "The action of leaving, typically to start a journey.", vietnamese: "sự khởi hành, sự rời đi", example: "My departure for Los Angeles is at 8 a.m. tomorrow.", wordFamily: "depart", collocations: "departure time, flight departure" },
+            { id: "u2c2_4", unit: 2, chapter: 2, word: "expire", ipa: "/ɪkˈspaɪə(r)/", pos: "v.", definition: "To come to an end of the validity period.", vietnamese: "hết hạn", example: "The milk in the refrigerator expires on Tuesday.", wordFamily: "expiration, expiry", collocations: "passport expires, contract expires" },
+            { id: "u2c2_5", unit: 2, chapter: 2, word: "precaution", ipa: "/prɪˈkɔːʃən/", pos: "n.", definition: "A measure taken in advance to prevent something dangerous.", vietnamese: "biện pháp phòng ngừa", example: "She took the precaution of bringing a sweater in case it got cold on the trip.", wordFamily: "precautious, precautionary", collocations: "safety precaution, take precautions" },
+            { id: "u2c2_6", unit: 2, chapter: 2, word: "purchase", ipa: "/ˈpɜːtʃəs/", pos: "v.", definition: "To acquire something by paying for it; buy.", vietnamese: "mua, sắm", example: "I purchased my first car when I was 17.", wordFamily: "purchaser", collocations: "purchase online, purchase order" },
+            { id: "u2c2_7", unit: 2, chapter: 2, word: "sincere", ipa: "/sɪnˈsɪə(r)/", pos: "adj.", definition: "Free from pretense or deceit; proceeding from genuine feelings.", vietnamese: "chân thành, thành thật", example: "Her love for you is sincere; she will stay with you in bad times.", wordFamily: "sincerely, sincerity", collocations: "sincere apology, sincere gratitude" },
+            { id: "u2c2_8", unit: 2, chapter: 2, word: "vulnerable", ipa: "/ˈvʌlnərəbəl/", pos: "adj.", definition: "Susceptible to physical or emotional attack or harm.", vietnamese: "dễ bị tổn thương, dễ bị ảnh hưởng", example: "An older person is more vulnerable to sickness.", wordFamily: "vulnerability", collocations: "vulnerable group, vulnerable to attack" },
+
+            // UNIT 3 CHAPTER 1
+            { id: "u3c1_1", unit: 3, chapter: 1, word: "credits", ipa: "/ˈkredɪts/", pos: "n.", definition: "A list of people involved in making a movie or television show.", vietnamese: "danh sách tên những người tham gia sản xuất phim", example: "The movie star’s name was first in the credits.", wordFamily: "credit", collocations: "end credits, roll credits" },
+            { id: "u3c1_2", unit: 3, chapter: 1, word: "crucial", ipa: "/ˈkruːʃəl/", pos: "adj.", definition: "Extremely important; decisive.", vietnamese: "cực kỳ quan trọng, thiết yếu", example: "It’s crucial that children eat a healthy breakfast each morning.", wordFamily: "crucially", collocations: "crucial role, crucial factor" },
+            { id: "u3c1_3", unit: 3, chapter: 1, word: "director", ipa: "/dəˈrektə(r)/", pos: "n.", definition: "A person who supervises the actors and crew in a film.", vietnamese: "đạo diễn", example: "The director of the film was Steven Spielberg.", wordFamily: "direct, direction", collocations: "film director, managing director" },
+            { id: "u3c1_4", unit: 3, chapter: 1, word: "exclusive", ipa: "/ɪkˈskluːsɪv/", pos: "adj.", definition: "Restricted to a particular person, group, or area.", vietnamese: "độc quyền, dành riêng", example: "This sale is exclusively for members.", wordFamily: "exclusively, exclusivity", collocations: "exclusive interview, exclusive right" },
+            { id: "u3c1_5", unit: 3, chapter: 1, word: "production", ipa: "/prəˈdʌkʃən/", pos: "n.", definition: "The process of making or manufacturing from components or raw materials.", vietnamese: "sự sản xuất, quá trình sản xuất", example: "Production on the new movie will start next month.", wordFamily: "produce, producer, productive", collocations: "mass production, film production" },
+            { id: "u3c1_6", unit: 3, chapter: 1, word: "scene", ipa: "/siːn/", pos: "n.", definition: "A sequence of continuous action in a play, movie, or book.", vietnamese: "cảnh phim, phân cảnh", example: "I cried while watching the last scene of the movie.", wordFamily: "scenery", collocations: "opening scene, action scene" },
+            { id: "u3c1_7", unit: 3, chapter: 1, word: "studio", ipa: "/ˈstjuːdiəʊ/", pos: "n.", definition: "A room where an artist, photographer, or filmmaker works.", vietnamese: "phòng thu, xưởng phim, xưởng nghệ thuật", example: "We take lessons at a ballet studio.", wordFamily: "recording studio", collocations: "art studio, film studio" },
+            { id: "u3c1_8", unit: 3, chapter: 1, word: "transform", ipa: "/trænsˈfɔːm/", pos: "v.", definition: "To make a thorough or dramatic change in the form or appearance.", vietnamese: "biến đổi, thay đổi hoàn toàn", example: "This book transformed my life; you should read it!", wordFamily: "transformation, transformative", collocations: "transform lives, completely transform" },
+
+            // UNIT 3 CHAPTER 2
+            { id: "u3c2_1", unit: 3, chapter: 2, word: "ambition", ipa: "/æmˈbɪʃən/", pos: "n.", definition: "A strong desire to do or to achieve something.", vietnamese: "tham vọng, hoài bão", example: "Lou’s ambition was to become a doctor.", wordFamily: "ambitious", collocations: "life ambition, achieve ambition" },
+            { id: "u3c2_2", unit: 3, chapter: 2, word: "debut", ipa: "/ˈdeɪbjuː/", pos: "n.", definition: "A person's first appearance or performance in a particular capacity.", vietnamese: "màn ra mắt, lần xuất hiện đầu tiên", example: "The party was to celebrate the debut of the CD.", wordFamily: "debut", collocations: "make a debut, directorial debut" },
+            { id: "u3c2_3", unit: 3, chapter: 2, word: "influential", ipa: "/ˌɪnfluˈenʃəl/", pos: "adj.", definition: "Having great influence on someone or something.", vietnamese: "có ảnh hưởng, có sức tác động", example: "The mayor was very influential in planning the museum.", wordFamily: "influence", collocations: "influential figure, influential leader" },
+            { id: "u3c2_4", unit: 3, chapter: 2, word: "inspiration", ipa: "/ˌɪnspəˈreɪʃən/", pos: "n.", definition: "The process of being mentally stimulated to do or feel something.", vietnamese: "nguồn cảm hứng, sự truyền cảm hứng", example: "My inspiration to paint comes from nature.", wordFamily: "inspire, inspiring", collocations: "source of inspiration, creative inspiration" },
+            { id: "u3c2_5", unit: 3, chapter: 2, word: "metaphor", ipa: "/ˈmetəfɔː(r)/", pos: "n.", definition: "A figure of speech in which a word or phrase is applied to an object.", vietnamese: "phép ẩn dụ", example: "The poet used a metaphor to say people are the same as trees.", wordFamily: "metaphorical", collocations: "use a metaphor, extended metaphor" },
+            { id: "u3c2_6", unit: 3, chapter: 2, word: "passion", ipa: "/ˈpæʃən/", pos: "n.", definition: "An intense desire or enthusiasm for something.", vietnamese: "niềm đam mê, sự say mê", example: "The singer said her passion for music comes from her mother.", wordFamily: "passionate", collocations: "pursue a passion, shared passion" },
+            { id: "u3c2_7", unit: 3, chapter: 2, word: "preserve", ipa: "/prɪˈzɜːv/", pos: "v.", definition: "To maintain something in its original or existing state.", vietnamese: "bảo tồn, gìn giữ", example: "We are using less paper in the office to help preserve the forest.", wordFamily: "preservation, preservative", collocations: "preserve nature, preserve culture" },
+            { id: "u3c2_8", unit: 3, chapter: 2, word: "represent", ipa: "/ˌreprɪˈzent/", pos: "v.", definition: "To be a symbol or embodiment of.", vietnamese: "đại diện, tượng trưng cho", example: "A wedding ring represents the love between two people.", wordFamily: "representation, representative", collocations: "represent a company, represent values" },
+
+            // UNIT 4 CHAPTER 1
+            { id: "u4c1_1", unit: 4, chapter: 1, word: "achievement", ipa: "/əˈtʃiːvmənt/", pos: "n.", definition: "A thing done successfully, typically by effort, courage, or skill.", vietnamese: "thành tựu, thành tích", example: "The Nobel Peace Prize is given to people who make great achievements.", wordFamily: "achieve", collocations: "great achievement, sense of achievement" },
+            { id: "u4c1_2", unit: 4, chapter: 1, word: "aspire", ipa: "/əˈspaɪə(r)/", pos: "v.", definition: "To direct one's hopes or ambitions towards achieving something.", vietnamese: "khao khát, mong muốn đạt được", example: "He has aspired to be in the Olympics since he was a young boy.", wordFamily: "aspiration, aspiring", collocations: "aspire to be, aspire to greatness" },
+            { id: "u4c1_3", unit: 4, chapter: 1, word: "exotic", ipa: "/ɪɡˈzɒtɪk/", pos: "adj.", definition: "Originating in or characteristic of a distant foreign country.", vietnamese: "kỳ lạ, ngoại lai, độc đáo", example: "The model has an exotic look.", wordFamily: "exotically", collocations: "exotic fruit, exotic location" },
+            { id: "u4c1_4", unit: 4, chapter: 1, word: "feat", ipa: "/fiːt/", pos: "n.", definition: "An achievement that requires great courage, skill, or strength.", vietnamese: "kỳ tích, thành tựu ấn tượng", example: "The circus acrobats performed a dangerous feat, walking across a rope high in the air.", wordFamily: "feat", collocations: "remarkable feat, athletic feat" },
+            { id: "u4c1_5", unit: 4, chapter: 1, word: "goal", ipa: "/ɡəʊl/", pos: "n.", definition: "The object of a person's ambition or effort; an aim or desired result.", vietnamese: "mục tiêu", example: "The goal of this meeting is to make a decision.", wordFamily: "goalkeeper", collocations: "achieve a goal, set a goal" },
+            { id: "u4c1_6", unit: 4, chapter: 1, word: "record", ipa: "/ˈrekɔːd/", pos: "n.", definition: "The best performance ever achieved in an athletic event.", vietnamese: "kỷ lục", example: "She holds the world record for the 100-meter dash.", wordFamily: "record, recorder", collocations: "break a record, world record" },
+            { id: "u4c1_7", unit: 4, chapter: 1, word: "talent", ipa: "/ˈtælənt/", pos: "n.", definition: "Natural aptitude or skill.", vietnamese: "tài năng, năng khiếu", example: "Wayne has a great talent for riding horses.", wordFamily: "talented", collocations: "natural talent, musical talent" },
+            { id: "u4c1_8", unit: 4, chapter: 1, word: "verify", ipa: "/ˈverɪfaɪ/", pos: "v.", definition: "To make sure or demonstrate that something is true, accurate, or justified.", vietnamese: "xác minh, kiểm chứng", example: "The newspaper verified that the factory was closing.", wordFamily: "verification, verifiable", collocations: "verify information, verify identity" },
+
+            // UNIT 4 CHAPTER 2
+            { id: "u4c2_1", unit: 4, chapter: 2, word: "aggressive", ipa: "/əˈɡresɪv/", pos: "adj.", definition: "Ready or likely to attack or confront.", vietnamese: "hung hăng, hiếu chiến", example: "Be careful; this dog is very aggressive and may bite.", wordFamily: "aggression, aggressively", collocations: "aggressive behavior, aggressive marketing" },
+            { id: "u4c2_2", unit: 4, chapter: 2, word: "amateur", ipa: "/ˈæmətə(r)/", pos: "n.", definition: "A person who engages in a pursuit, especially a sport, on an unpaid basis.", vietnamese: "người nghiệp dư", example: "This class is for amateur photographers.", wordFamily: "amateurish", collocations: "amateur photographer, amateur sport" },
+            { id: "u4c2_3", unit: 4, chapter: 2, word: "coach", ipa: "/kəʊtʃ/", pos: "n.", definition: "An athletic instructor or trainer.", vietnamese: "huấn luyện viên", example: "My coach wants me to run two miles before every practice.", wordFamily: "coaching", collocations: "head coach, soccer coach" },
+            { id: "u4c2_4", unit: 4, chapter: 2, word: "enthusiastic", ipa: "/ɪnˌθjuːziˈæstɪk/", pos: "adj.", definition: "Having or showing intense and eager enjoyment or interest.", vietnamese: "nhiệt tình, hào hứng", example: "I’m not very enthusiastic about doing the dinner dishes.", wordFamily: "enthusiasm, enthusiastically", collocations: "enthusiastic support, enthusiastic response" },
+            { id: "u4c2_5", unit: 4, chapter: 2, word: "professional", ipa: "/prəˈfeʃənəl/", pos: "adj.", definition: "Engaged in a specified activity as one's main paid occupation.", vietnamese: "chuyên nghiệp, thuộc nghề nghiệp", example: "Professional football players must train hard.", wordFamily: "profession, professionally", collocations: "professional career, professional athlete" },
+            { id: "u4c2_6", unit: 4, chapter: 2, word: "role model", ipa: "/ˈrəʊl ˌmɒdəl/", pos: "n.", definition: "A person looked to by others as an example to be imitated.", vietnamese: "hình mẫu, tấm gương", example: "Michael Jordan was my childhood role model.", wordFamily: "role", collocations: "positive role model, role model for youth" },
+            { id: "u4c2_7", unit: 4, chapter: 2, word: "sense of humor", ipa: "/ˌsens əv ˈhjuːmə(r)/", pos: "phr.", definition: "A person's ability to appreciate humor or make other people laugh.", vietnamese: "khiếu hài hước", example: "Jack got mad at the joke; he has no sense of humor.", wordFamily: "humor", collocations: "great sense of humor, dry sense of humor" },
+            { id: "u4c2_8", unit: 4, chapter: 2, word: "tournament", ipa: "/ˈtʊənəmənt/", pos: "n.", definition: "A series of contests between a number of competitors, competing for an overall prize.", vietnamese: "giải đấu, cuộc thi đấu", example: "The winner of the tournament receives a check for $100,000.", wordFamily: "tourney", collocations: "tennis tournament, win a tournament" },
+
+            // UNIT 5 CHAPTER 1
+            { id: "u5c1_1", unit: 5, chapter: 1, word: "breathe", ipa: "/briːð/", pos: "v.", definition: "To take air into the lungs and send it out again.", vietnamese: "thở, hít thở", example: "In the mountains, you can breathe fresh air.", wordFamily: "breath, breathing", collocations: "breathe deeply, breathe clean air" },
+            { id: "u5c1_2", unit: 5, chapter: 1, word: "complex", ipa: "/ˈkɒmpleks/", pos: "adj.", definition: "Consisting of many different and connected parts; complicated.", vietnamese: "phức tạp", example: "Economics is a very complex subject.", wordFamily: "complexity", collocations: "complex system, complex problem" },
+            { id: "u5c1_3", unit: 5, chapter: 1, word: "consist of", ipa: "/kənˈsɪst əv/", pos: "v.", definition: "To be composed or made up of.", vietnamese: "bao gồm, gồm có", example: "A team consists of a leader and a few followers.", wordFamily: "consistency", collocations: "consist of parts, consist mainly of" },
+            { id: "u5c1_4", unit: 5, chapter: 1, word: "illness", ipa: "/ˈɪlnəs/", pos: "n.", definition: "A disease or period of sickness affecting the body or mind.", vietnamese: "bệnh tật, tình trạng ốm", example: "Did the doctor say your illness is serious?", wordFamily: "ill", collocations: "mental illness, serious illness" },
+            { id: "u5c1_5", unit: 5, chapter: 1, word: "injury", ipa: "/ˈɪndʒəri/", pos: "n.", definition: "Harm or damage to the body.", vietnamese: "chấn thương, thương tích", example: "A broken arm or leg is a very common injury in extreme sports.", wordFamily: "injure, injured", collocations: "sports injury, head injury" },
+            { id: "u5c1_6", unit: 5, chapter: 1, word: "suffer", ipa: "/ˈsʌfə(r)/", pos: "v.", definition: "To experience or be affected by something bad.", vietnamese: "chịu đựng, trải qua đau khổ", example: "Many people suffered through the war.", wordFamily: "suffering, sufferer", collocations: "suffer from pain, suffer losses" },
+            { id: "u5c1_7", unit: 5, chapter: 1, word: "surgery", ipa: "/ˈsɜːdʒəri/", pos: "n.", definition: "Medical treatment of the body by surgical operation.", vietnamese: "phẫu thuật", example: "My father has a weak heart and needs surgery to make him better.", wordFamily: "surgeon, surgical", collocations: "heart surgery, undergo surgery" },
+            { id: "u5c1_8", unit: 5, chapter: 1, word: "treatment", ipa: "/ˈtriːtmənt/", pos: "n.", definition: "Medical care given to a patient for an illness or injury.", vietnamese: "sự điều trị, phương pháp điều trị", example: "The doctor suggested a few home treatments, such as hot baths.", wordFamily: "treat", collocations: "medical treatment, effective treatment" },
+
+            // UNIT 5 CHAPTER 2
+            { id: "u5c2_1", unit: 5, chapter: 2, word: "blind", ipa: "/blaɪnd/", pos: "adj.", definition: "Unable to see; lacking sight.", vietnamese: "mù, khiếm thị", example: "A blind person uses a walking stick when walking down the street alone.", wordFamily: "blindness", collocations: "legally blind, blind spot" },
+            { id: "u5c2_2", unit: 5, chapter: 2, word: "bounce", ipa: "/baʊns/", pos: "v.", definition: "To spring back after hitting a solid surface.", vietnamese: "nảy, bật lại", example: "The pebble bounced off the surface of the water.", wordFamily: "bouncy", collocations: "bounce a ball, bounce back" },
+            { id: "u5c2_3", unit: 5, chapter: 2, word: "capable", ipa: "/ˈkeɪpəbəl/", pos: "adj.", definition: "Having the ability, fitness, or quality necessary to do something.", vietnamese: "có khả năng, đủ năng lực", example: "My new washing machine is capable of washing 20 pounds of clothes at one time.", wordFamily: "capability, capably", collocations: "capable of doing, highly capable" },
+            { id: "u5c2_4", unit: 5, chapter: 2, word: "overcome", ipa: "/ˌəʊvəˈkʌm/", pos: "v.", definition: "To succeed in dealing with a problem or difficulty.", vietnamese: "vượt qua, khắc phục", example: "Only after Rodney overcomes his fear of water will he be able to enjoy swimming.", wordFamily: "overcoming", collocations: "overcome fear, overcome challenges" },
+            { id: "u5c2_5", unit: 5, chapter: 2, word: "phenomenon", fəˈnɒmɪnən: "phenomenon", ipa: "/fəˈnɒmɪnən/", pos: "n.", definition: "A fact or situation that is observed to happen, especially one whose cause is in question.", vietnamese: "hiện tượng", example: "The northern lights of Alaska and Western Canada is one natural phenomenon I hope to see one day.", wordFamily: "phenomena", collocations: "natural phenomenon, social phenomenon" },
+            { id: "u5c2_6", unit: 5, chapter: 2, word: "refine", ipa: "/rɪˈfaɪn/", pos: "v.", definition: "To improve something by making small changes.", vietnamese: "cải tiến, tinh chỉnh", example: "Your plan is almost ready; it only needs to be refined slightly.", wordFamily: "refinement, refined", collocations: "refine a process, refine skills" },
+            { id: "u5c2_7", unit: 5, chapter: 2, word: "sensitive", ipa: "/ˈsensətɪv/", pos: "adj.", definition: "Quick to detect or respond to slight changes, signals, or influences.", vietnamese: "nhạy cảm, dễ bị ảnh hưởng", example: "I wear sunglasses because my eyes are sensitive to light.", wordFamily: "sensitivity, sensitively", collocations: "sensitive skin, sensitive to light" },
+            { id: "u5c2_8", unit: 5, chapter: 2, word: "sight", ipa: "/saɪt/", pos: "n.", definition: "The faculty or power of seeing.", vietnamese: "thị giác, khả năng nhìn", example: "The sight in my right eye is better than in my left eye.", wordFamily: "unsightly", collocations: "loss of sight, sense of sight" },
+
+            // UNIT 6 CHAPTER 1
+            { id: "u6c1_1", unit: 6, chapter: 1, word: "decorate", ipa: "/ˈdekəreɪt/", pos: "v.", definition: "To make something look more attractive by adding items.", vietnamese: "trang trí", example: "We decorated our house for the holidays.", wordFamily: "decoration, decorative", collocations: "decorate a room, decorate for Christmas" },
+            { id: "u6c1_2", unit: 6, chapter: 1, word: "display", ipa: "/dɪˈspleɪ/", pos: "v.", definition: "To put something in a prominent place in order to be seen.", vietnamese: "trưng bày, hiển thị", example: "The store displays its goods in glass cases.", wordFamily: "display", collocations: "display items, display screen" },
+            { id: "u6c1_3", unit: 6, chapter: 1, word: "precious", ipa: "/ˈpreʃəs/", pos: "adj.", definition: "Of great value; not to be wasted or treated carelessly.", vietnamese: "quý giá, đáng trân trọng", example: "My time is very precious.", wordFamily: "preciously, preciousness", collocations: "precious time, precious metals" },
+            { id: "u6c1_4", unit: 6, chapter: 1, word: "preserve", ipa: "/prɪˈzɜːv/", pos: "v.", definition: "To protect from harm or destruction; maintain.", vietnamese: "bảo vệ, gìn giữ, bảo tồn", example: "The ancient pot was placed in a special room to preserve it.", wordFamily: "preservation", collocations: "preserve history, preserve food" },
+            { id: "u6c1_5", unit: 6, chapter: 1, word: "define", ipa: "/dɪˈfaɪn/", pos: "v.", definition: "To state or describe the exact nature or scope of something.", vietnamese: "định nghĩa, giải thích", example: "You should define your point before trying to argue it.", wordFamily: "definition, definite", collocations: "define terms, clearly define" },
+            { id: "u6c1_6", unit: 6, chapter: 1, word: "supplies", ipa: "/səˈplaɪz/", pos: "n.", definition: "Stocks of goods or materials.", vietnamese: "vật tư, nguồn cung cấp", example: "That farm buys its supplies of feed and grain from the local feed store.", wordFamily: "supply, supplier", collocations: "office supplies, medical supplies" },
+            { id: "u6c1_7", unit: 6, chapter: 1, word: "throw something away", ipa: "/θrəʊ ˌsʌmθɪŋ əˈweɪ/", pos: "phr.", definition: "To get rid of something that you no longer want or need.", vietnamese: "vứt bỏ, loại bỏ", example: "He threw away the old newspapers.", wordFamily: "throwaway", collocations: "throw away trash" },
+            { id: "u6c1_8", unit: 6, chapter: 1, word: "universal", ipa: "/ˌjuːnɪˈvɜːsəl/", pos: "adj.", definition: "Applicable to all cases worldwide or in a particular group.", vietnamese: "phổ biến toàn cầu, mang tính phổ quát", example: "Poverty is a universal problem; it happens all over the world.", wordFamily: "universally, universality", collocations: "universal truth, universal appeal" },
+
+            // UNIT 6 CHAPTER 2
+            { id: "u6c2_1", unit: 6, chapter: 2, word: "approximately", ipa: "/əˈprɒksɪmətli/", pos: "adv.", definition: "Used to show that something is almost, but not completely, accurate.", vietnamese: "xấp xỉ, khoảng", example: "My dog weighs approximately ten kilograms.", wordFamily: "approximate", collocations: "approximately equal, cost approximately" },
+            { id: "u6c2_2", unit: 6, chapter: 2, word: "convert", ipa: "/kənˈvɜːt/", pos: "v.", definition: "To change in form, character, or function.", vietnamese: "chuyển đổi, biến đổi", example: "I want to convert the extra bedroom in my apartment to an office.", wordFamily: "conversion", collocations: "convert currency, convert format" },
+            { id: "u6c2_3", unit: 6, chapter: 2, word: "detail", ipa: "/ˈdiːteɪl/", pos: "n.", definition: "An individual fact or item.", vietnamese: "chi tiết", example: "There is one detail in the contract that is unclear to me.", wordFamily: "detailed, detailing", collocations: "in detail, minor detail" },
+            { id: "u6c2_4", unit: 6, chapter: 2, word: "isolated", ipa: "/ˈaɪsəleɪtɪd/", pos: "adj.", definition: "Far away from other places, buildings, or people; remote.", vietnamese: "cô lập, biệt lập, tách biệt", example: "When I want to feel isolated, I go to my house in the mountains.", wordFamily: "isolate, isolation", collocations: "isolated area, isolated incident" },
+            { id: "u6c2_5", unit: 6, chapter: 2, word: "loyal", ipa: "/lɔɪəl/", pos: "adj.", definition: "Giving constant and firm support or allegiance to a person or institution.", vietnamese: "trung thành, tận tụy", example: "The store gives special discounts to its loyal customers.", wordFamily: "loyalty", collocations: "loyal customer, loyal friend" },
+            { id: "u6c2_6", unit: 6, chapter: 2, word: "persuade", ipa: "/pəˈsweɪd/", pos: "v.", definition: "To cause someone to do something through reasoning or argument.", vietnamese: "thuyết phục", example: "I persuaded my friend to join me on vacation.", wordFamily: "persuasion, persuasive", collocations: "persuade someone to, easy to persuade" },
+            { id: "u6c2_7", unit: 6, chapter: 2, word: "response", ipa: "/rɪˈspɒns/", pos: "n.", definition: "A answer or reaction to something.", vietnamese: "phản hồi, sự đáp lại", example: "I sent a letter to my brother, but I’ve yet to get a response.", wordFamily: "respond, responsive", collocations: "in response to, quick response" },
+            { id: "u6c2_8", unit: 6, chapter: 2, word: "switch", ipa: "/swɪtʃ/", pos: "v.", definition: "To change from one thing to another.", vietnamese: "chuyển đổi, thay đổi", example: "To lose weight, Bill switched from regular milk to low-fat milk.", wordFamily: "switchable", collocations: "switch jobs, switch off" }
+        ];
+
+        // APPLICATION STATE
+        let appState = {
+            currentUnit: 'all',
+            currentChapter: 'all',
+            currentMode: 'en-vi', // 'en-vi', 'vi-en', 'random', 'review'
+            currentIndex: 0,
+            filteredCards: [],
+            isFlipped: false,
+            knownWords: new Set(),
+            reviewWords: new Set(),
+            controlBarHidden: false,
+            activeTab: 'flashcard'
+        };
+
+        // LOAD SAVED STATE FROM LOCAL STORAGE
+        function loadStorageState() {
+            try {
+                const savedKnown = localStorage.getItem('vm_known');
+                if (savedKnown) appState.knownWords = new Set(JSON.parse(savedKnown));
+
+                const savedReview = localStorage.getItem('vm_review');
+                if (savedReview) appState.reviewWords = new Set(JSON.parse(savedReview));
+
+                const savedBar = localStorage.getItem('vm_bar_hidden');
+                if (savedBar !== null) {
+                    appState.controlBarHidden = JSON.parse(savedBar);
+                    if (appState.controlBarHidden) applyHideControlBar(true);
+                }
+
+                const savedMode = localStorage.getItem('vm_mode');
+                if (savedMode) {
+                    appState.currentMode = savedMode;
+                    document.getElementById('mode-select').value = savedMode;
+                    const mobMode = document.getElementById('mode-select-mob');
+                    if (mobMode) mobMode.value = savedMode;
+                }
+            } catch(e) {
+                console.error("Error loading localStorage:", e);
+            }
+        }
+
+        // SAVE STATE TO LOCAL STORAGE
+        function saveStorageState() {
+            try {
+                localStorage.setItem('vm_known', JSON.stringify([...appState.knownWords]));
+                localStorage.setItem('vm_review', JSON.stringify([...appState.reviewWords]));
+                localStorage.setItem('vm_bar_hidden', JSON.stringify(appState.controlBarHidden));
+                localStorage.setItem('vm_mode', appState.currentMode);
+            } catch(e) {
+                console.error("Error saving localStorage:", e);
+            }
+        }
+
+        // INITIALIZE APP
+        window.addEventListener('DOMContentLoaded', () => {
+            loadStorageState();
+            updateFilteredCards();
+            renderCurrentCard();
+            updateStatsUI();
+
+            // Keyboard navigation listener
+            window.addEventListener('keydown', (e) => {
+                if (appState.activeTab !== 'flashcard') return;
+                // Do not trigger if typing in input
+                if (['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+
+                if (e.code === 'Space') {
+                    e.preventDefault();
+                    flipCard();
+                } else if (e.code === 'ArrowRight') {
+                    e.preventDefault();
+                    nextCard();
+                } else if (e.code === 'ArrowLeft') {
+                    e.preventDefault();
+                    prevCard();
+                } else if (e.code === 'KeyK') {
+                    e.preventDefault();
+                    markKnown();
+                } else if (e.code === 'KeyR') {
+                    e.preventDefault();
+                    markReview();
+                } else if (e.code === 'KeyS') {
+                    e.preventDefault();
+                    shuffleCards();
+                }
+            });
+        });
+
+        // FILTER AND CARDS LOGIC
+        function updateFilteredCards() {
+            let cards = [...VOCABULARY_DATA];
+
+            // Filter by Unit
+            if (appState.currentUnit !== 'all') {
+                const uNum = parseInt(appState.currentUnit);
+                cards = cards.filter(c => c.unit === uNum);
+            }
+
+            // Filter by Chapter
+            if (appState.currentChapter !== 'all') {
+                const cNum = parseInt(appState.currentChapter);
+                cards = cards.filter(c => c.chapter === cNum);
+            }
+
+            // Filter by Mode
+            if (appState.currentMode === 'review') {
+                cards = cards.filter(c => appState.reviewWords.has(c.id));
+                if (cards.length === 0) {
+                    showCustomModal("Thông báo", "Chưa có từ vựng nào trong danh sách 'Cần ôn tập'. Hãy đánh dấu các từ bạn muốn xem lại!", "fa-bookmark", "amber");
+                }
+            } else if (appState.currentMode === 'random') {
+                // Shuffle array
+                cards.sort(() => Math.random() - 0.5);
+            }
+
+            appState.filteredCards = cards;
+            if (appState.currentIndex >= appState.filteredCards.length) {
+                appState.currentIndex = 0;
+            }
+        }
+
+        function onFilterChange() {
+            appState.currentUnit = document.getElementById('unit-select').value;
+            appState.currentChapter = document.getElementById('chapter-select').value;
+            
+            // Sync mobile select if needed
+            const mobUnit = document.getElementById('unit-select-mob');
+            if (mobUnit) mobUnit.value = appState.currentUnit;
+
+            appState.currentIndex = 0;
+            appState.isFlipped = false;
+            updateFilteredCards();
+            renderCurrentCard();
+            updateStatsUI();
+        }
+
+        function onModeChange() {
+            appState.currentMode = document.getElementById('mode-select').value;
+            const mobMode = document.getElementById('mode-select-mob');
+            if (mobMode) mobMode.value = appState.currentMode;
+
+            appState.currentIndex = 0;
+            appState.isFlipped = false;
+            updateFilteredCards();
+            renderCurrentCard();
+            saveStorageState();
+        }
+
+        // RENDER CURRENT CARD
+        function renderCurrentCard() {
+            const cards = appState.filteredCards;
+            if (cards.length === 0) {
+                document.getElementById('front-main-text').innerText = "Không có từ vựng";
+                document.getElementById('front-ipa').innerText = "/---/";
+                document.getElementById('front-pos').innerText = "---";
+                document.getElementById('front-badge').innerText = "Trống";
+                document.getElementById('card-counter').innerText = "0 / 0";
+                document.getElementById('progress-bar').style.width = '0%';
+                return;
+            }
+
+            const card = cards[appState.currentIndex];
+            const isViToEn = appState.currentMode === 'vi-en';
+
+            // Badge text
+            const badgeText = `Unit ${card.unit} • Chapter ${card.chapter}`;
+            document.getElementById('front-badge').innerText = badgeText;
+            document.getElementById('back-badge').innerText = badgeText;
+            document.getElementById('current-category-badge').innerText = badgeText;
+
+            // Counter & Progress
+            const total = cards.length;
+            const current = appState.currentIndex + 1;
+            document.getElementById('card-counter').innerText = `Thẻ ${current} / ${total}`;
+            const percent = (current / total) * 100;
+            document.getElementById('progress-bar').style.width = `${percent}%`;
+
+            // Front & Back content based on mode
+            if (isViToEn) {
+                document.getElementById('front-sub-hint').innerText = "Vietnamese Meaning";
+                document.getElementById('front-main-text').innerText = card.vietnamese;
+                document.getElementById('front-ipa').innerText = card.pos;
+                document.getElementById('front-pos').innerText = `Unit ${card.unit}`;
+                
+                // Back side shows English Word
+                document.getElementById('back-vietnamese').innerText = card.word;
+                document.getElementById('back-definition').innerHTML = `<span class="font-mono text-sky-400">${card.ipa}</span> • <span class="italic">${card.pos}</span><br>${card.definition}`;
+            } else {
+                document.getElementById('front-sub-hint').innerText = "English Vocabulary";
+                document.getElementById('front-main-text').innerText = card.word;
+                document.getElementById('front-ipa').innerText = card.ipa;
+                document.getElementById('front-pos').innerText = card.pos;
+
+                // Back side shows Vietnamese & Definition
+                document.getElementById('back-vietnamese').innerText = card.vietnamese;
+                document.getElementById('back-definition').innerText = card.definition;
+            }
+
+            // Example & Details
+            document.getElementById('back-example').innerText = `"${card.example}"`;
+
+            // Reset card flip state if needed
+            if (appState.isFlipped) {
+                flipCard(true); // force unflip visually without toggling state variable immediately
+            }
+            appState.isFlipped = false;
+
+            // Update bookmark / known button states
+            updateCardActionButtons(card.id);
+        }
+
+        function updateCardActionButtons(cardId) {
+            const isKnown = appState.knownWords.has(cardId);
+            const isReview = appState.reviewWords.has(cardId);
+
+            const knownBtns = [document.getElementById('front-known-btn'), document.getElementById('back-known-btn')];
+            knownBtns.forEach(btn => {
+                if (isKnown) {
+                    btn.className = "w-9 h-9 rounded-full bg-emerald-500 text-white flex items-center justify-center transition-all shadow-sm";
+                } else {
+                    btn.className = "w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 hover:text-emerald-600 text-slate-400 flex items-center justify-center transition-all";
+                }
+            });
+
+            const reviewBtns = [document.getElementById('front-review-btn'), document.getElementById('back-review-btn')];
+            reviewBtns.forEach(btn => {
+                if (isReview) {
+                    btn.className = "w-9 h-9 rounded-full bg-amber-500 text-white flex items-center justify-center transition-all shadow-sm";
+                } else {
+                    btn.className = "w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-amber-50 hover:text-amber-600 text-slate-400 flex items-center justify-center transition-all";
+                }
+            });
+        }
+
+        // FLIP CARD ACTION
+        function flipCard(forceReset = false) {
+            const inner = document.getElementById('flashcard-inner');
+            if (forceReset) {
+                inner.style.transform = 'rotateY(0deg)';
+                appState.isFlipped = false;
+                return;
+            }
+            appState.isFlipped = !appState.isFlipped;
+            if (appState.isFlipped) {
+                inner.style.transform = 'rotateY(180deg)';
+            } else {
+                inner.style.transform = 'rotateY(0deg)';
+            }
+        }
+
+        // NAVIGATION CONTROLS
+        function nextCard() {
+            if (appState.filteredCards.length === 0) return;
+            appState.currentIndex = (appState.currentIndex + 1) % appState.filteredCards.length;
+            renderCurrentCard();
+        }
+
+        function prevCard() {
+            if (appState.filteredCards.length === 0) return;
+            appState.currentIndex = (appState.currentIndex - 1 + appState.filteredCards.length) % appState.filteredCards.length;
+            renderCurrentCard();
+        }
+
+        function shuffleCards() {
+            appState.filteredCards.sort(() => Math.random() - 0.5);
+            appState.currentIndex = 0;
+            renderCurrentCard();
+        }
+
+        // MARK KNOWN & REVIEW
+        function markKnown() {
+            const cards = appState.filteredCards;
+            if (cards.length === 0) return;
+            const card = cards[appState.currentIndex];
+
+            if (appState.knownWords.has(card.id)) {
+                appState.knownWords.delete(card.id);
+            } else {
+                appState.knownWords.add(card.id);
+                // remove from review if known
+                appState.reviewWords.delete(card.id);
+            }
+            saveStorageState();
+            updateCardActionButtons(card.id);
+            updateStatsUI();
+            nextCard();
+        }
+
+        function markReview() {
+            const cards = appState.filteredCards;
+            if (cards.length === 0) return;
+            const card = cards[appState.currentIndex];
+
+            if (appState.reviewWords.has(card.id)) {
+                appState.reviewWords.delete(card.id);
+            } else {
+                appState.reviewWords.add(card.id);
+            }
+            saveStorageState();
+            updateCardActionButtons(card.id);
+            updateStatsUI();
+            nextCard();
+        }
+
+        function toggleKnownCurrent(e) {
+            e.stopPropagation();
+            const cards = appState.filteredCards;
+            if (cards.length === 0) return;
+            const card = cards[appState.currentIndex];
+            if (appState.knownWords.has(card.id)) {
+                appState.knownWords.delete(card.id);
+            } else {
+                appState.knownWords.add(card.id);
+                appState.reviewWords.delete(card.id);
+            }
+            saveStorageState();
+            updateCardActionButtons(card.id);
+            updateStatsUI();
+        }
+
+        function toggleReviewCurrent(e) {
+            e.stopPropagation();
+            const cards = appState.filteredCards;
+            if (cards.length === 0) return;
+            const card = cards[appState.currentIndex];
+            if (appState.reviewWords.has(card.id)) {
+                appState.reviewWords.delete(card.id);
+            } else {
+                appState.reviewWords.add(card.id);
+            }
+            saveStorageState();
+            updateCardActionButtons(card.id);
+            updateStatsUI();
+        }
+
+        // PRONUNCIATION (WEB SPEECH API - BRITISH ENGLISH PRIORITY)
+        function playPronunciation(e) {
+            if (e) e.stopPropagation();
+            const cards = appState.filteredCards;
+            if (cards.length === 0) return;
+            const card = cards[appState.currentIndex];
+
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(card.word);
+                utterance.lang = 'en-GB'; // British English
+                utterance.rate = 0.9;
+                
+                // Try to find a British voice
+                const voices = window.speechSynthesis.getVoices();
+                const ukVoice = voices.find(v => v.lang === 'en-GB' || v.lang.includes('GB'));
+                if (ukVoice) utterance.voice = ukVoice;
+
+                window.speechSynthesis.speak(utterance);
+            } else {
+                showCustomModal("Thông báo", "Trình duyệt của bạn không hỗ trợ phát âm thanh tự động.", "fa-volume-xmark", "rose");
+            }
+        }
+
+        // STATS & DASHBOARD UPDATER
+        function updateStatsUI() {
+            const knownCount = appState.knownWords.size;
+            const reviewCount = appState.reviewWords.size;
+
+            document.getElementById('stat-known-count').innerText = knownCount;
+            document.getElementById('stat-review-count').innerText = reviewCount;
+
+            document.getElementById('dash-known-count').innerText = knownCount;
+            document.getElementById('dash-review-count').innerText = reviewCount;
+
+            const knownPercent = Math.round((knownCount / 96) * 100);
+            document.getElementById('dash-known-percent').innerText = `${knownPercent}% hoàn thành`;
+            document.getElementById('dash-overall-percent').innerText = `${knownPercent}%`;
+
+            // Render Unit breakdown
+            const unitListContainer = document.getElementById('unit-progress-list');
+            unitListContainer.innerHTML = '';
+            for (let u = 1; u <= 6; u++) {
+                const unitCards = VOCABULARY_DATA.filter(c => c.unit === u);
+                const unitKnown = unitCards.filter(c => appState.knownWords.has(c.id)).length;
+                const uPercent = Math.round((unitKnown / unitCards.length) * 100);
+
+                const unitDiv = document.createElement('div');
+                unitDiv.className = "space-y-1.5";
+                unitDiv.innerHTML = `
+                    <div class="flex items-center justify-between text-xs font-semibold text-slate-700">
+                        <span>Unit ${u} (16 từ vựng)</span>
+                        <span class="text-sky-600">${unitKnown}/16 đã thuộc (${uPercent}%)</span>
+                    </div>
+                    <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                        <div class="bg-sky-500 h-full rounded-full transition-all duration-300" style="width: ${uPercent}%"></div>
+                    </div>
+                `;
+                unitListContainer.appendChild(unitDiv);
+            }
+
+            // Render Recent Studied Words
+            const recentContainer = document.getElementById('recent-words-list');
+            recentContainer.innerHTML = '';
+            // take last 6 cards from dataset or filtered
+            const recentCards = VOCABULARY_DATA.slice(0, 6);
+            recentCards.forEach(c => {
+                const isKnown = appState.knownWords.has(c.id);
+                const itemDiv = document.createElement('div');
+                itemDiv.className = "bg-slate-50 p-3 rounded-2xl border border-slate-200/80 flex items-center justify-between";
+                itemDiv.innerHTML = `
+                    <div>
+                        <div class="font-bold text-slate-900 text-xs">${c.word}</div>
+                        <div class="text-[11px] text-slate-500 truncate max-w-[150px]">${c.vietnamese}</div>
+                    </div>
+                    <span class="text-[10px] px-2 py-0.5 rounded-full ${isKnown ? 'bg-emerald-100 text-emerald-700 font-medium' : 'bg-slate-200 text-slate-600'}">
+                        ${isKnown ? 'Đã thuộc' : 'Chưa học'}
+                    </span>
+                `;
+                recentContainer.appendChild(itemDiv);
+            });
+        }
+
+        // VIEW SWITCHER
+        function switchView(viewName) {
+            appState.activeTab = viewName;
+            const flashcardView = document.getElementById('view-flashcard');
+            const dashboardView = document.getElementById('view-dashboard');
+            const btnFlashcard = document.getElementById('nav-btn-flashcard');
+            const btnDashboard = document.getElementById('nav-btn-dashboard');
+            const filterControls = document.getElementById('filter-controls');
+
+            if (viewName === 'flashcard') {
+                flashcardView.classList.remove('hidden');
+                dashboardView.classList.add('hidden');
+                btnFlashcard.className = "px-3 py-1.5 rounded-lg transition-all text-slate-700 bg-white shadow-sm flex items-center gap-1.5";
+                btnDashboard.className = "px-3 py-1.5 rounded-lg transition-all text-slate-600 hover:text-slate-900 flex items-center gap-1.5";
+                filterControls.classList.remove('hidden');
+                renderCurrentCard();
+            } else {
+                flashcardView.classList.add('hidden');
+                dashboardView.classList.remove('hidden');
+                btnDashboard.className = "px-3 py-1.5 rounded-lg transition-all text-slate-700 bg-white shadow-sm flex items-center gap-1.5";
+                btnFlashcard.className = "px-3 py-1.5 rounded-lg transition-all text-slate-600 hover:text-slate-900 flex items-center gap-1.5";
+                filterControls.classList.add('hidden');
+                updateStatsUI();
+            }
+        }
+
+        // CONTROL BAR HIDE / SHOW
+        function toggleControlBar() {
+            appState.controlBarHidden = !appState.controlBarHidden;
+            applyHideControlBar(appState.controlBarHidden);
+            saveStorageState();
+        }
+
+        function applyHideControlBar(hidden) {
+            const bar = document.getElementById('top-control-bar');
+            const trigger = document.getElementById('show-bar-trigger');
+            if (hidden) {
+                bar.classList.add('-translate-y-full', 'opacity-0', 'pointer-events-none');
+                trigger.classList.remove('-translate-y-full', 'opacity-0', 'pointer-events-none');
+            } else {
+                bar.classList.remove('-translate-y-full', 'opacity-0', 'pointer-events-none');
+                trigger.classList.add('-translate-y-full', 'opacity-0', 'pointer-events-none');
+            }
+        }
+
+        // SEARCH MODAL
+        function openSearchModal() {
+            document.getElementById('search-modal').classList.remove('hidden');
+            document.getElementById('search-modal').classList.add('flex');
+            document.getElementById('search-input').focus();
+        }
+
+        function closeSearchModal() {
+            document.getElementById('search-modal').classList.add('hidden');
+            document.getElementById('search-modal').classList.remove('flex');
+        }
+
+        function handleSearch(query) {
+            const resultsContainer = document.getElementById('search-results');
+            const q = query.trim().toLowerCase();
+            if (!q) {
+                resultsContainer.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs">Nhập từ khóa để bắt đầu tìm kiếm trong 96 từ vựng...</div>`;
+                return;
+            }
+
+            const matched = VOCABULARY_DATA.filter(c => 
+                c.word.toLowerCase().includes(q) || c.vietnamese.toLowerCase().includes(q) || c.definition.toLowerCase().includes(q)
+            );
+
+            if (matched.length === 0) {
+                resultsContainer.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs">Không tìm thấy từ vựng phù hợp với "${query}".</div>`;
+                return;
+            }
+
+            resultsContainer.innerHTML = '';
+            matched.forEach(c => {
+                const div = document.createElement('div');
+                div.className = "bg-slate-50 hover:bg-sky-50/50 p-3.5 rounded-2xl border border-slate-200/80 cursor-pointer transition-all flex items-center justify-between";
+                div.onclick = () => {
+                    closeSearchModal();
+                    // Jump to this card
+                    appState.currentUnit = 'all';
+                    appState.currentChapter = 'all';
+                    document.getElementById('unit-select').value = 'all';
+                    document.getElementById('chapter-select').value = 'all';
+                    updateFilteredCards();
+                    const index = appState.filteredCards.findIndex(item => item.id === c.id);
+                    if (index !== -1) {
+                        appState.currentIndex = index;
+                        renderCurrentCard();
+                    }
+                    if (appState.activeTab !== 'flashcard') {
+                        switchView('flashcard');
+                    }
+                };
+                div.innerHTML = `
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-slate-900 text-sm">${c.word}</span>
+                            <span class="text-xs text-sky-600 font-mono">${c.ipa}</span>
+                            <span class="text-[10px] bg-slate-200 px-2 py-0.5 rounded italic">${c.pos}</span>
+                        </div>
+                        <div class="text-xs text-slate-600 mt-0.5">${c.vietnamese}</div>
+                    </div>
+                    <span class="text-[10px] bg-sky-100 text-sky-700 font-semibold px-2.5 py-1 rounded-full">Unit ${c.unit}</span>
+                `;
+                resultsContainer.appendChild(div);
+            });
+        }
+
+        // SETTINGS MODAL
+        function openSettingsModal() {
+            document.getElementById('settings-modal').classList.remove('hidden');
+            document.getElementById('settings-modal').classList.add('flex');
+        }
+
+        function closeSettingsModal() {
+            document.getElementById('settings-modal').classList.add('hidden');
+            document.getElementById('settings-modal').classList.remove('flex');
+        }
+
+        function confirmResetProgress() {
+            closeSettingsModal();
+            showConfirmModal("Xác nhận đặt lại", "Bạn có chắc chắn muốn xóa toàn bộ tiến độ học tập (các từ đã thuộc, cần ôn)? Hành động này không thể hoàn tác.", () => {
+                appState.knownWords.clear();
+                appState.reviewWords.clear();
+                saveStorageState();
+                updateFilteredCards();
+                renderCurrentCard();
+                updateStatsUI();
+                showCustomModal("Thành công", "Đã đặt lại toàn bộ tiến độ học tập.", "fa-circle-check", "emerald");
+            });
+        }
+
+        // CUSTOM MODALS
+        function showCustomModal(title, message, iconClass = "fa-circle-info", color = "sky") {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-message').innerText = message;
+            const iconDiv = document.getElementById('modal-icon');
+            iconDiv.className = `w-12 h-12 rounded-full bg-${color}-50 text-${color}-600 flex items-center justify-center text-xl mb-3`;
+            iconDiv.innerHTML = `<i class="fa-solid ${iconClass}"></i>`;
+            
+            const actions = document.getElementById('modal-actions');
+            actions.innerHTML = `<button onclick="closeCustomModal()" class="flex-1 bg-${color}-600 hover:bg-${color}-700 text-white text-xs font-semibold py-2.5 rounded-xl transition-all">Đồng ý</button>`;
+
+            const modal = document.getElementById('custom-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function showConfirmModal(title, message, onConfirm) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-message').innerText = message;
+            const iconDiv = document.getElementById('modal-icon');
+            iconDiv.className = `w-12 h-12 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center text-xl mb-3`;
+            iconDiv.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i>`;
+            
+            const actions = document.getElementById('modal-actions');
+            actions.innerHTML = `
+                <button onclick="closeCustomModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 rounded-xl transition-all">Hủy</button>
+                <button id="confirm-yes-btn" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold py-2.5 rounded-xl transition-all">Xác nhận</button>
+            `;
+            document.getElementById('confirm-yes-btn').onclick = () => {
+                closeCustomModal();
+                onConfirm();
+            };
+
+            const modal = document.getElementById('custom-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeCustomModal() {
+            document.getElementById('custom-modal').classList.add('hidden');
+            document.getElementById('custom-modal').classList.remove('flex');
+        }
+    </script>
+</body>
+</html>
